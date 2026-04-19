@@ -1,9 +1,6 @@
 # environnement virtuel
 venv/
 
-# variables d'environnement
-.env
-
 # logs
 logs/
 airflow/logs/
