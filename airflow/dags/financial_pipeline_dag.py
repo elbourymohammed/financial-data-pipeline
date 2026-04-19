@@ -1,62 +1,66 @@
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
+from airflow.providers.standard.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import sys
-import os
 
-sys.path.append('/Users/elbourymohammed/Desktop/Data_Project/src')
+sys.path.insert(0, '/Users/elbourymohammed/Desktop/Data_Project/src')
 
-base_path: str = '/Users/elbourymohammed/Desktop/Data_Project/src/scripts/'
+# Import des runners pour l'ingestion
+from runners.crypto_runner import run as run_crypto
+from runners.fx_rates_runner import run as run_fx
+from runners.macro_indicators_runner import run as run_macro
+from runners.metal_runner import run as run_metal
+
+DBT_PATH = '/Users/elbourymohammed/Desktop/Data_Project/metal_project'
 
 default_args = {
-    'owner' : 'admin',
-    'retries' : 1,
-    'retry_delay' : timedelta(minutes=5)
+    'owner': 'admin',
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5)
 }
 
-with DAG (
-    dag_id = "financial_mart",
+with DAG(
+    dag_id='financial_pipeline',
     default_args=default_args,
-    description="Ingestion, transformation and test data",
-    schedule="0 0 * * FRI",
+    description='Financial data ingestion and transformation pipeline',
+    schedule='0 0 * * FRI',
     start_date=datetime(2025, 1, 1),
     catchup=False,
     tags=['finance', 'metals', 'crypto'],
 ) as dag:
 
-    init_db = BashOperator(
-        bash_command=f'python3 {base_path}/init_db.py',
-        task_id="initialisation_de_bdd"
-    )
-    
-    ingest_crypto = BashOperator(
-        bash_command=f'python3 {base_path}/ingest_crypto.py',
-        task_id="ingest_crypto_data"
+    # Ingestion des données avec les runners
+    ingest_crypto = PythonOperator(
+        task_id='ingest_crypto',
+        python_callable=run_crypto,
     )
 
-    ingest_fx_rates = BashOperator(
-        bash_command=f'python3 {base_path}/ingest_fx_rates.py',
-        task_id="ingest_fx_rates_data"
+    ingest_fx = PythonOperator(
+        task_id='ingest_fx_rates',
+        python_callable=run_fx,
     )
 
-    ingest_macro_indicators = BashOperator(
-        bash_command=f'python3 {base_path}/ingest_macro_indicators.py',
-        task_id="ingest_macro_indicators_data"
+    ingest_macro = PythonOperator(
+        task_id='ingest_macro_indicators',
+        python_callable=run_macro,
     )
 
-    ingest_metal = BashOperator(
-        bash_command=f'python3 {base_path}/ingest_metal.py',
-        task_id="ingest_metal_data"
+    ingest_metal = PythonOperator(
+        task_id='ingest_metal',
+        python_callable=run_metal,
     )
 
+    # DBT transformation
     dbt_transformation = BashOperator(
-        bash_command=f'cd /Users/elbourymohammed/Desktop/Data_Project/metal_project && dbt run',
-        task_id="dbt_transformation"
+        task_id='dbt_transformation',
+        bash_command=f'cd {DBT_PATH} && dbt run --full-refresh',
     )
 
     dbt_test = BashOperator(
-        bash_command=f'cd /Users/elbourymohammed/Desktop/Data_Project/metal_project && dbt test',
-        task_id="dbt_tests"
+        task_id='dbt_tests',
+        bash_command=f'cd {DBT_PATH} && dbt test',
     )
 
-    pipeline = init_db >> [ingest_macro_indicators, ingest_crypto, ingest_fx_rates, ingest_metal] >> dbt_transformation >> dbt_test
+    # Pipeline: ingestion en parallèle -> DBT
+    [ingest_crypto, ingest_fx, ingest_macro, ingest_metal] >> dbt_transformation >> dbt_test
