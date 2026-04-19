@@ -1,0 +1,31 @@
+# environnement virtuel
+venv/
+
+# variables d'environnement
+.env
+
+# logs
+logs/
+airflow/logs/
+
+# dbt
+metal_project/target/
+metal_project/dbt_packages/
+metal_project/logs/
+
+# airflow
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/standalone_admin_password.txt
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# vscode
+.vscode/
+
+# données locales
+data_metals.csv

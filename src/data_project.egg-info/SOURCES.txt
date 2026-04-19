@@ -1,0 +1,12 @@
+setup.py
+src/data_project.egg-info/PKG-INFO
+src/data_project.egg-info/SOURCES.txt
+src/data_project.egg-info/dependency_links.txt
+src/data_project.egg-info/top_level.txt
+src/database/Database.py
+src/database/__init__.py
+src/scripts/__init__.py
+src/scripts/ingest.py
+src/scripts/init_db.py
+tests/test_api.py
+tests/test_connection_db.py
