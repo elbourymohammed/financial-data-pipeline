@@ -1,6 +1,5 @@
 WITH raw_crypto_prices AS (
     SELECT * from {{ source('public', 'raw_crypto_prices') }}
-rypto_prices
 ),
 
 deduplicates AS(
