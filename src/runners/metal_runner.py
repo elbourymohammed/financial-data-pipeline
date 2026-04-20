@@ -25,11 +25,11 @@ def run() -> None:
                 data = fetch_metal_price(metal, 'USD', date)
                 if data:
                     insert_metal(db, data)
-                    logger.info(f"✅ {date} {metal} -> inserted")
+                    logger.info(f"{date} {metal} -> inserted")
                 else:
                     logger.warning(f"{date} {metal}: No data returned")
             except Exception as e:
-                logger.error(f"❌ {date} {metal}: {e}")
+                logger.error(f"{date} {metal}: {e}")
 
 if __name__ == "__main__":
     run()

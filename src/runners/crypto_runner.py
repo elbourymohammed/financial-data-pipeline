@@ -21,9 +21,9 @@ def run() -> None:
         try:
             date_str, price = get_crypto_usd()
             insert_crypto(db, date_str, "bitcoin", price)
-            logger.info(f"✅ {date_str} -> {price}")
+            logger.info(f"Inserted crypto: {date_str} -> {price}")
         except Exception as e:
-            logger.error(f"❌ Error occurred: {e}")
+            logger.error(f"Error occurred: {e}")
 
 if __name__ == "__main__":
     run()

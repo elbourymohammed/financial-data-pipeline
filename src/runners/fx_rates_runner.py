@@ -19,9 +19,9 @@ def run() -> None:
         try:
             data = get_fx_rates()
             insert_fx_data(db, data)
-            logger.info(f"✅ FX rates for yesterday inserted")
+            logger.info(f"FX rates for yesterday inserted")
         except Exception as e:
-            logger.error(f"❌ Error inserting FX rates: {e}")
+            logger.error(f"Error inserting FX rates: {e}")
 
 if __name__ == "__main__":
     run()

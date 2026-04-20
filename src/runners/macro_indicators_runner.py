@@ -24,9 +24,9 @@ def run() -> None:
                 insert_macro_indicators(db, observations, name)
                 valid_count = len([obs for obs in observations if obs.get('value') != '.'])
                 total_inserted += valid_count
-                logger.info(f"✅ {name} -> {valid_count} inserted")
+                logger.info(f"{name} -> {valid_count} inserted")
             except Exception as e:
-                logger.error(f"❌ {name}: {e}")
+                logger.error(f"{name}: {e}")
         logger.info(f"✅ Total data ingested: {total_inserted}")
 
 if __name__ == "__main__":
