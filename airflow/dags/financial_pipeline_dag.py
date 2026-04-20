@@ -3,8 +3,10 @@ from airflow.providers.standard.operators.bash import BashOperator
 from airflow.providers.standard.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import sys
+import os
 
-sys.path.insert(0, '/Users/elbourymohammed/Desktop/Data_Project/src')
+DBT_PATH: str = str(os.getenv('DBT_PATH'))
+sys.path.insert(0, DBT_PATH)
 
 # Import des runners pour l'ingestion
 from runners.crypto_runner import run as run_crypto
@@ -12,7 +14,6 @@ from runners.fx_rates_runner import run as run_fx
 from runners.macro_indicators_runner import run as run_macro
 from runners.metal_runner import run as run_metal
 
-DBT_PATH = '/Users/elbourymohammed/Desktop/Data_Project/metal_project'
 
 default_args = {
     'owner': 'admin',
