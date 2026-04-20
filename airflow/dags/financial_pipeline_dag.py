@@ -27,7 +27,7 @@ with DAG(
     description='Financial data ingestion and transformation pipeline',
     schedule='0 0 * * *',
     start_date=datetime(2025, 1, 1),
-    catchup=False,
+    catchup=True,
     tags=['finance', 'metals', 'crypto'],
 ) as dag:
 
