@@ -25,13 +25,14 @@ with DAG(
     dag_id='financial_pipeline',
     default_args=default_args,
     description='Financial data ingestion and transformation pipeline',
-    schedule='0 0 * * FRI',
+    schedule='0 0 * * *',
     start_date=datetime(2025, 1, 1),
     catchup=False,
     tags=['finance', 'metals', 'crypto'],
 ) as dag:
 
-    # Ingestion des données avec les runners
+    # Ingestion des données pour la veille
+    # Chaque runner récupère automatiquement la date d'hier
     ingest_crypto = PythonOperator(
         task_id='ingest_crypto',
         python_callable=run_crypto,

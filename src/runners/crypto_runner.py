@@ -12,19 +12,18 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database.Database import Database
-from services.crypto_services import get_crypto_usd, generate_dates
+from services.crypto_services import get_crypto_usd
 from repositories.crypto_repository import insert_crypto
 
-def run(start_date: str = "20251031", nb_days: int = 5) -> None:
+def run() -> None:
+    """Ingest Bitcoin price for yesterday."""
     with Database() as db:
-        dates = generate_dates(start_date, nb_days)
-        for date in dates:
-            try:
-                date_str, price = get_crypto_usd(date)
-                insert_crypto(db, date_str, "bitcoin", price)
-                logger.info(f"✅ {date_str} -> {price}")
-            except Exception as e:
-                logger.error(f"❌ Error occurred: {e}")
+        try:
+            date_str, price = get_crypto_usd()
+            insert_crypto(db, date_str, "bitcoin", price)
+            logger.info(f"✅ {date_str} -> {price}")
+        except Exception as e:
+            logger.error(f"❌ Error occurred: {e}")
 
 if __name__ == "__main__":
     run()

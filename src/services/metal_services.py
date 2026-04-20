@@ -46,12 +46,7 @@ def fetch_metal_price(metal_symbol: str, currency_code: str, date: str) -> Optio
         print(f"API error: {e}")
         return None
 
-def generate_dates(start: str, n: int) -> list:
-    start_date = datetime.strptime(start, "%Y%m%d")
-    dates = []
-    current = start_date
-    while len(dates) < n:
-        if current.weekday() < 5:
-            dates.append(current.strftime("%Y%m%d"))
-        current += timedelta(days=1)
-    return dates
+def get_yesterday_date() -> str:
+    """Get yesterday's date in YYYYMMDD format."""
+    yesterday = datetime.now() - timedelta(days=1)
+    return yesterday.strftime("%Y%m%d")

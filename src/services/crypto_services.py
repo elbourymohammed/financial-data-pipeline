@@ -1,12 +1,21 @@
 from datetime import datetime, timedelta
+from typing import Optional
 import logging
 import requests
 
 logger = logging.getLogger(__name__)
 
-def get_crypto_usd(date: datetime) -> tuple:
-    """Fetch Bitcoin price for given date."""
-    formatted_date = date.strftime("%Y-%m-%d")
+def get_yesterday_date() -> str:
+    """Get yesterday's date in YYYY-MM-DD format."""
+    yesterday = datetime.now() - timedelta(days=1)
+    return yesterday.strftime("%Y-%m-%d")
+
+def get_crypto_usd(date: Optional[str] = None) -> tuple:
+    """Fetch Bitcoin price for given date (defaults to yesterday)."""
+    if date is None:
+        formatted_date = get_yesterday_date()
+    else:
+        formatted_date = date
     
     url = "https://api.coingecko.com/api/v3/coins/bitcoin/history"
     params = {"date": formatted_date, "localization": "false"}
@@ -26,15 +35,3 @@ def get_crypto_usd(date: datetime) -> tuple:
     except (requests.RequestException, ValueError) as e:
         logger.error(f"Error fetching Bitcoin price: {e}")
         raise
-
-def generate_dates(start: str, n: int):
-    start_date = datetime.strptime(start, "%Y%m%d")
-    dates = []
-    current = start_date
-
-    while len(dates) < n:
-        if current.weekday() < 5:
-            dates.append(current)
-        current += timedelta(days=1)
-
-    return dates
