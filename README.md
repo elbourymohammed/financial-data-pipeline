@@ -32,7 +32,6 @@ Le projet collecte des données brutes depuis plusieurs sources, les stocke dans
 
 ## Limites actuelles
 
-- **Données d'hier uniquement** : chaque runner récupère uniquement les données du jour précédent pour respecter les quotas API limités.
 - **Quotas API** : l'analyse est restreinte par les limitations de nombre de requêtes des APIs utilisées. Chaque source (GoldAPI, CoinGecko, FX, FRED) a ses propres contraintes de rate-limiting.
 Ne possibilité d'historique complet** : pour étendre l'horizon d'analyse, il faudrait gérer les quotas, implémenter un cache, et configurer une orchestration complète avec retry logic.
 
