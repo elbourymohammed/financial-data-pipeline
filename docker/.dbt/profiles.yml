@@ -1,0 +1,25 @@
+# dbt profiles configuration
+metal_project:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: "{{ env_var('DB_USER', 'airflow') }}"
+      password: "{{ env_var('DB_PASSWORD', 'airflow') }}"
+      port: 5432
+      dbname: "{{ env_var('DB_NAME', 'airflow') }}"
+      schema: staging
+      threads: 4
+      keepalives_idle: 0
+      
+    prod:
+      type: postgres
+      host: postgres
+      user: "{{ env_var('DB_USER', 'airflow') }}"
+      password: "{{ env_var('DB_PASSWORD', 'airflow') }}"
+      port: 5432
+      dbname: "{{ env_var('DB_NAME', 'airflow') }}"
+      schema: marts
+      threads: 4
+      keepalives_idle: 0

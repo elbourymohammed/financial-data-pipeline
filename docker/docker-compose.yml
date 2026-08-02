@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: data_project_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-airflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-airflow}
+      POSTGRES_DB: ${DB_NAME:-airflow}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-airflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - data_network
+
+  # Airflow Webserver
+  airflow-webserver:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: data_project_airflow_webserver
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://${DB_USER:-airflow}:${DB_PASSWORD:-airflow}@postgres:5432/${DB_NAME:-airflow}
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-Drmhze6EPcv0K5m5rWXAawImxQ0LK16f_QsrP-pzOIE=}
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      DB_USER: ${DB_USER:-airflow}
+      DB_PASSWORD: ${DB_PASSWORD:-airflow}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-airflow}
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../src:/opt/app/src
+      - airflow_logs:/opt/airflow/logs
+      - airflow_plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    command: bash -c "airflow db init && airflow webserver"
+    networks:
+      - data_network
+
+  # Airflow Scheduler
+  airflow-scheduler:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: data_project_airflow_scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://${DB_USER:-airflow}:${DB_PASSWORD:-airflow}@postgres:5432/${DB_NAME:-airflow}
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-Drmhze6EPcv0K5m5rWXAawImxQ0LK16f_QsrP-pzOIE=}
+      DB_USER: ${DB_USER:-airflow}
+      DB_PASSWORD: ${DB_PASSWORD:-airflow}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-airflow}
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../src:/opt/app/src
+      - airflow_logs:/opt/airflow/logs
+      - airflow_plugins:/opt/airflow/plugins
+    command: bash -c "airflow db init && airflow scheduler"
+    networks:
+      - data_network
+
+volumes:
+  postgres_data:
+  airflow_logs:
+  airflow_plugins:
+
+networks:
+  data_network:
+    driver: bridge

@@ -16,7 +16,7 @@ def test_connection():
         db.connect()
         db.disconnect()
     except Exception as e:
-        print(f"❌ Connection failed: {e}")
+        print(f"Connection failed: {e}")
 
 
 test_connection()

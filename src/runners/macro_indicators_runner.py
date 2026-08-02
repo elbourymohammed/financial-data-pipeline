@@ -27,7 +27,7 @@ def run() -> None:
                 logger.info(f"{name} -> {valid_count} inserted")
             except Exception as e:
                 logger.error(f"{name}: {e}")
-        logger.info(f"✅ Total data ingested: {total_inserted}")
+        logger.info(f"Total data ingested: {total_inserted}")
 
 if __name__ == "__main__":
     run()

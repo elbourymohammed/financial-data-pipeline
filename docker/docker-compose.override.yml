@@ -1,0 +1,24 @@
+# Docker Compose Override for Local Development
+# This file automatically merges with docker-compose.yml for local overrides
+
+version: '3.8'
+
+services:
+  airflow-webserver:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../src:/opt/app/src
+      - airflow_logs:/opt/airflow/logs
+    command: bash -c "pip install -r requirements.txt && airflow db init && airflow webserver"
+
+  airflow-scheduler:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../src:/opt/app/src
+      - airflow_logs:/opt/airflow/logs
